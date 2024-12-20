@@ -7,16 +7,26 @@ import com.sunwoo.mynote.databinding.ItemNoteBinding
 
 class NoteAdapter(
     private var noteList: MutableList<Note>,
-    private val onDelete: (Int) -> Unit
+    private val onDelete: (Int) -> Unit,
+    private val onUpdate: (Int) -> Unit
 ) : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
 
 
     inner class NoteViewHolder(private val binding: ItemNoteBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(note: Note, position: Int) {
-            binding.tvTitle.text = note.title
+            val titleMaxLength = 20
+            val longTitle = if (note.title.length > titleMaxLength) {
+                note.title.substring(0, titleMaxLength) + "..."
+            } else {
+                note.title
+            }
+
+            binding.tvTitle.text = longTitle
             binding.tvContent.text = note.content
+            binding.tvDate.text = note.date
             binding.btnDelete.setOnClickListener { onDelete(position) }
+            binding.btnEdit.setOnClickListener { onUpdate(position) }
         }
     }
 
@@ -28,12 +38,12 @@ class NoteAdapter(
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        val todo = noteList[position]
-        holder.bind(todo, position)
+        val note = noteList[position]
+        holder.bind(note, position)
     }
 
-    fun updateData(newTodoList: MutableList<Note>) {
-        noteList = newTodoList
+    fun updateData(newNoteList: MutableList<Note>) {
+        noteList = newNoteList
         notifyDataSetChanged()
     }
 }
